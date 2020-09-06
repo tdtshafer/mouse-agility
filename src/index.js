@@ -26,10 +26,13 @@ var INITIAL_CONFIG = {
   timeRemaining: 30.0,
   timeIsUp: false,
 
-  targetLeft: 200,
-  targetTop: 200,
+  targetLeft: 250,
+  targetTop: 250,
 
   randomMode: true,
+
+  showSettings: false,
+
 }
 
 class Timer extends React.Component {
@@ -73,6 +76,7 @@ class Game extends React.Component{
   constructor(props){
     super(props);
     this.state = INITIAL_CONFIG;
+    this.gameArea = React.createRef()
   }
 
   tick() {
@@ -92,31 +96,38 @@ class Game extends React.Component{
   
   handleTargetClick(i){
     
-    let width = 500; // TODO: calculate dynamically
-    let height = 500;
+    let width = this.gameArea.current.offsetWidth*0.92; //to accommodate button width
+    let height = this.gameArea.current.offsetHeight*0.95; //to accommodate button height
+
+    let offsetLeft = this.gameArea.current.offsetLeft/2;
+    let offsetTop = this.gameArea.current.offsetTop/2;
 
     let newDecoys = [];
     
     for (var i = 0; i <= this.state.decoysToAdd; i++){
+      let randomTop = Math.floor(Math.random()*height) + offsetTop;
+      let randomLeft = Math.floor(Math.random()*width) + offsetLeft;
       newDecoys.push(
         <Button 
           key={this.state.decoys.length + i} 
           text={this.state.decoyText} 
           handleClick={() => this.handleDecoyClick(i)}
-          top={Math.floor(Math.random()*height)}
-          left={Math.floor(Math.random()*width)} 
+          top={randomTop}
+          left={randomLeft}
         />
       )
     }
     
+    let target
+
     this.setState({
       decoys: this.state.decoys.concat(newDecoys),
       decoysToAdd: this.state.decoysToAdd+2,
       successfulClicks: this.state.successfulClicks+1,
       splitIndex: Math.floor(Math.random()*this.state.decoys.length+1),
       timerStarted: true,
-      targetLeft: Math.floor(Math.random()*width),
-      targetTop: Math.floor(Math.random()*height),
+      targetTop: Math.floor(Math.random()*height) + offsetTop,
+      targetLeft: Math.floor(Math.random()*width) + offsetLeft,
     })
 
   }
@@ -152,10 +163,13 @@ class Game extends React.Component{
     }
 
     return (
-      <div class="gameContainer">
+      <div>
         <Timer tick={()=>this.tick()} timeStatus={this.state.timeStatus}/>
-        <h>Score: {this.state.successfulClicks}</h>
-        {targetAndDecoysDiv}
+        <div ref={this.gameArea} class="gameContainer">
+          
+          <h>Score: {this.state.successfulClicks}</h>
+          {targetAndDecoysDiv}
+        </div>
       </div>
     )
     
@@ -166,6 +180,8 @@ ReactDOM.render(
   <div>
     <div>
       <h>Find the targets and avoid the decoys!</h>
+      <br/>
+      <button class="settingButton">Settings</button>
     </div>
     <Game/>
   </div>,
