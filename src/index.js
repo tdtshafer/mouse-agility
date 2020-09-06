@@ -13,18 +13,16 @@ import * as serviceWorker from './serviceWorker';
 
 
 
-
-
 class Clock extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {date: new Date()};
+    this.state = {timeRemaining: 30.0};
   }
 
   componentDidMount() {
     this.timerID = setInterval(
       () => this.tick(),
-      1000
+      100
     );
   }
 
@@ -34,80 +32,86 @@ class Clock extends React.Component {
 
   tick() {
     this.setState({
-      date: new Date()
+      timeRemaining: Math.round((this.state.timeRemaining-0.1)*10)/10,
     });
   }
 
   render() {
+    let timeStatus;
+    if (this.state.timeRemaining < 0){
+      timeStatus = "Time is Up!"
+    } else {
+      timeStatus = "Time Remaining:" + this.state.timeRemaining + "s"
+    }
     return (
       <div>
-        <h2>It is {this.state.date.toLocaleTimeString()}.</h2>
+        <h2>{timeStatus}</h2>
       </div>
     )
   }
 }
 
-const decoys = []
-
-class Decoy extends React.Component {
-  constructor(props){
-    super(props);
-    this.state = {
-      targetText: props.targetText,
-      text: props.text
-    };
-
-    // This binding is necessary to make `this` work in the callback
-    this.handleClick = this.handleClick.bind(this);
-  }
-  
-  handleClick(){
-    this.setState({
-      text: "clicked"
-    })
-
-  }
-
-  render(){
-    return (
-        <button onClick={this.handleClick}>
-          {this.state.text}
-        </button>
-    )
-  }
+function Button(props){
+  return <button onClick={props.handleClick}>{props.text}</button>
 }
 
-
-class Decoys extends React.Component {
-  
+class Game extends React.Component{
   constructor(props){
     super(props);
     this.state = {
-      decoyList: [1,2,3,4,5],
-    };
-  };
-
-  render(){
-    let listOfDecoys = []
-
-    for (const [index, value] of this.state.decoyList.entries()) {
-      listOfDecoys.push(<Decoy text="decoy"/>)
+      successfulClicks: 0,
+      decoysToAdd: 1,
+      decoys: [],
+      decoyText: "decoy",
+      targetText: "target",
     }
-    
-    return (
-        <div>
-          {listOfDecoys}
-        </div>
-      );
-  };
-
   }
 
+  handleTargetClick(i){
+    let newDecoys = [];
+    
+    for (var i = 0; i <= this.state.decoysToAdd; i++){
+      newDecoys.push(
+        <Button 
+          key={this.state.decoys.length + i} 
+          text={this.state.decoyText} 
+          handleClick={() => this.handleDecoyClick(i)} 
+        />
+      )
+    }
+
+    this.setState({
+      decoys: this.state.decoys.concat(newDecoys),
+      decoysToAdd: this.state.decoysToAdd+2,
+      successfulClicks: this.state.successfulClicks+1,
+    })
+  }
+
+  handleDecoyClick(i){
+    return;
+  }
+
+  render(){
+    let splitIndex = Math.floor(Math.random()*this.state.decoys.length+1);
+
+    return (
+    <div>
+      <h>Score: {this.state.successfulClicks}</h>
+      <div>
+        {this.state.decoys.slice(0, splitIndex)}
+        <Button text={this.state.targetText} handleClick={(i) => this.handleTargetClick(i)} />
+        {this.state.decoys.slice(splitIndex, this.state.decoys.length)}
+      </div>
+    </div>
+    )
+    
+  }
+}
 
 ReactDOM.render(
   <div>
     <Clock/>
-    <Decoys/>
+    <Game/>
   </div>,
   
   document.getElementById('root')
