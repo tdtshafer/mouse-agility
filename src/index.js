@@ -32,7 +32,6 @@ var INITIAL_CONFIG = {
   randomMode: true,
 
   showSettings: false,
-
 }
 
 class Timer extends React.Component {
@@ -57,6 +56,29 @@ class Timer extends React.Component {
   }
 }
 
+class Form extends React.Component {
+  constructor(props){
+    super(props);
+    this.state = {value: props.value}
+    this.handleChange = this.props.handleChange.bind(this);
+  }
+  render(){
+    return (
+      <form>
+        <label>
+          {this.props.label}:
+          <input 
+            value={this.state.value} 
+            type={this.props.inputType} 
+            name={this.props.inputName} 
+            onChange={this.handleChange}
+          />
+        </label>
+      </form>
+    )
+  }
+}
+
 function Button(props){
 
   let positionDict = {
@@ -65,11 +87,13 @@ function Button(props){
     left: props.left,
   }
 
-  return <button 
-          class="button" 
-          onClick={props.handleClick}
-          style={positionDict}
-        >{props.text}</button>
+  return (
+    <button 
+      class="button" 
+      onClick={props.handleClick}
+      style={positionDict}
+    >{props.text}</button>
+  )
 }
 
 class Game extends React.Component{
@@ -93,8 +117,7 @@ class Game extends React.Component{
     }
   }
 
-  
-  handleTargetClick(i){
+  handleTargetClick(){
     
     let width = this.gameArea.current.offsetWidth*0.92; //to accommodate button width
     let height = this.gameArea.current.offsetHeight*0.95; //to accommodate button height
@@ -118,7 +141,7 @@ class Game extends React.Component{
       )
     }
     
-    let target
+    let target;
 
     this.setState({
       decoys: this.state.decoys.concat(newDecoys),
@@ -136,7 +159,49 @@ class Game extends React.Component{
     return;
   }
 
+  handleSettingsClick(){
+    this.setState({
+      showSettings: true
+    })
+  }
+
+  handleTargetTextChange(event) {
+    this.setState({targetText: event.target.value});
+  }
+
+  handleDecoyTextChange(event) {
+    this.setState({decoyText: event.target.value});
+  }
+
+  handleCloseSettingsClick() {
+    this.setState({showSettings: false});
+  }
+
   render(){
+    if (this.state.showSettings){
+      return (
+      <div>
+        <div ref={this.gameArea} class="gameContainer">
+          <Form 
+            label="Target Text" 
+            inputType="text" 
+            inputName="targetTextInput"
+            value={this.state.targetText}
+            handleChange={()=>this.handleTargetTextChange}>
+          </Form>
+          <Form 
+            label="Decoy Text" 
+            inputType="text" 
+            inputName="decoyTextInput" 
+            value={this.state.decoyText}
+            handleChange={()=>this.handleDecoyTextChange}>  
+          </Form>
+        </div>
+        <button onClick={()=>this.handleCloseSettingsClick}>Close</button>
+      </div>
+      )
+    }
+
     let targetButton = <Button 
                         text={this.state.targetText} 
                         handleClick={(i) => this.handleTargetClick(i)} 
@@ -164,10 +229,10 @@ class Game extends React.Component{
 
     return (
       <div>
+        <button onClick={(i) => this.handleSettingsClick(i)} >Settings</button>
         <Timer tick={()=>this.tick()} timeStatus={this.state.timeStatus}/>
+        <h>Score: {this.state.successfulClicks}</h>
         <div ref={this.gameArea} class="gameContainer">
-          
-          <h>Score: {this.state.successfulClicks}</h>
           {targetAndDecoysDiv}
         </div>
       </div>
@@ -176,13 +241,9 @@ class Game extends React.Component{
   }
 }
 
+
 ReactDOM.render(
   <div>
-    <div>
-      <h>Find the targets and avoid the decoys!</h>
-      <br/>
-      <button class="settingButton">Settings</button>
-    </div>
     <Game/>
   </div>,
   
