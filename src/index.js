@@ -123,7 +123,7 @@ class Game extends React.Component{
     let height = this.gameArea.current.offsetHeight*0.95; //to accommodate button height
 
     let offsetLeft = this.gameArea.current.offsetLeft/2;
-    let offsetTop = this.gameArea.current.offsetTop/2;
+    let offsetTop = this.gameArea.current.offsetTop;
 
     let newDecoys = [];
     
@@ -144,7 +144,8 @@ class Game extends React.Component{
     let target;
 
     this.setState({
-      decoys: this.state.decoys.concat(newDecoys),
+      // decoys: this.state.decoys.concat(newDecoys), // for persistent decoys
+      decoys: newDecoys, //for decoys that reset each time
       decoysToAdd: this.state.decoysToAdd+2,
       successfulClicks: this.state.successfulClicks+1,
       splitIndex: Math.floor(Math.random()*this.state.decoys.length+1),
