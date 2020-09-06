@@ -11,3 +11,15 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+.button {
+  width: 8%;
+  margin: 1%;
+}
+
+.gameContainer {
+  width: 90%;
+  margin-left: 5%;
+  height: 500px;
+  background-color: aqua;
+}

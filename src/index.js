@@ -22,9 +22,14 @@ var INITIAL_CONFIG = {
   targetText: "target",
 
   timerStarted: false,
-  gameTime: 5, //time in seconds
-  timeRemaining: 5.0,
+  gameTime: 30, //time in seconds
+  timeRemaining: 30.0,
   timeIsUp: false,
+
+  targetLeft: 200,
+  targetTop: 200,
+
+  randomMode: true,
 }
 
 class Timer extends React.Component {
@@ -50,7 +55,18 @@ class Timer extends React.Component {
 }
 
 function Button(props){
-  return <button onClick={props.handleClick}>{props.text}</button>
+
+  let positionDict = {
+    position:"absolute", 
+    top: props.top, 
+    left: props.left,
+  }
+
+  return <button 
+          class="button" 
+          onClick={props.handleClick}
+          style={positionDict}
+        >{props.text}</button>
 }
 
 class Game extends React.Component{
@@ -76,6 +92,9 @@ class Game extends React.Component{
   
   handleTargetClick(i){
     
+    let width = 500; // TODO: calculate dynamically
+    let height = 500;
+
     let newDecoys = [];
     
     for (var i = 0; i <= this.state.decoysToAdd; i++){
@@ -83,7 +102,9 @@ class Game extends React.Component{
         <Button 
           key={this.state.decoys.length + i} 
           text={this.state.decoyText} 
-          handleClick={() => this.handleDecoyClick(i)} 
+          handleClick={() => this.handleDecoyClick(i)}
+          top={Math.floor(Math.random()*height)}
+          left={Math.floor(Math.random()*width)} 
         />
       )
     }
@@ -94,6 +115,8 @@ class Game extends React.Component{
       successfulClicks: this.state.successfulClicks+1,
       splitIndex: Math.floor(Math.random()*this.state.decoys.length+1),
       timerStarted: true,
+      targetLeft: Math.floor(Math.random()*width),
+      targetTop: Math.floor(Math.random()*height),
     })
 
   }
@@ -103,22 +126,47 @@ class Game extends React.Component{
   }
 
   render(){
-    return (
+    let targetButton = <Button 
+                        text={this.state.targetText} 
+                        handleClick={(i) => this.handleTargetClick(i)} 
+                        top={this.state.targetTop}
+                        left={this.state.targetLeft} 
+                      />
+
+    let targetAndDecoysDiv;
+    if (this.state.randomMode){
+      targetAndDecoysDiv = (
       <div>
+        {this.state.decoys}
+        {targetButton}
+      </div>
+      )
+    } else {
+      targetAndDecoysDiv = (
+      <div>
+        {this.state.decoys.slice(0, this.state.splitIndex)}
+        {targetButton}
+        {this.state.decoys.slice(this.state.splitIndex, this.state.decoys.length)}
+      </div>
+      )
+    }
+
+    return (
+      <div class="gameContainer">
         <Timer tick={()=>this.tick()} timeStatus={this.state.timeStatus}/>
         <h>Score: {this.state.successfulClicks}</h>
-        <div>
-          {this.state.decoys.slice(0, this.state.splitIndex)}
-          <Button text={this.state.targetText} handleClick={(i) => this.handleTargetClick(i)} />
-          {this.state.decoys.slice(this.state.splitIndex, this.state.decoys.length)}
-        </div>
+        {targetAndDecoysDiv}
       </div>
     )
+    
   }
 }
 
 ReactDOM.render(
   <div>
+    <div>
+      <h>Find the targets and avoid the decoys!</h>
+    </div>
     <Game/>
   </div>,
   
