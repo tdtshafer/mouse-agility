@@ -11,18 +11,28 @@ import * as serviceWorker from './serviceWorker';
 //   document.getElementById('root')
 // );
 
+var INITIAL_CONFIG = {
+  successfulClicks: 0, // user's score
 
+  decoysToAdd: 1,
+  decoys: [],
+  splitIndex: 0,
 
-class Clock extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {timeRemaining: 30.0};
-  }
+  decoyText: "decoy",
+  targetText: "target",
+
+  timerStarted: false,
+  gameTime: 5, //time in seconds
+  timeRemaining: 5.0,
+  timeIsUp: false,
+}
+
+class Timer extends React.Component {
 
   componentDidMount() {
     this.timerID = setInterval(
-      () => this.tick(),
-      100
+      () => this.props.tick(),
+      100 //one tenth of a second
     );
   }
 
@@ -30,22 +40,10 @@ class Clock extends React.Component {
     clearInterval(this.timerID);
   }
 
-  tick() {
-    this.setState({
-      timeRemaining: Math.round((this.state.timeRemaining-0.1)*10)/10,
-    });
-  }
-
   render() {
-    let timeStatus;
-    if (this.state.timeRemaining < 0){
-      timeStatus = "Time is Up!"
-    } else {
-      timeStatus = "Time Remaining:" + this.state.timeRemaining + "s"
-    }
     return (
       <div>
-        <h2>{timeStatus}</h2>
+        <h2>{this.props.timeStatus}</h2>
       </div>
     )
   }
@@ -58,16 +56,26 @@ function Button(props){
 class Game extends React.Component{
   constructor(props){
     super(props);
-    this.state = {
-      successfulClicks: 0,
-      decoysToAdd: 1,
-      decoys: [],
-      decoyText: "decoy",
-      targetText: "target",
+    this.state = INITIAL_CONFIG;
+  }
+
+  tick() {
+    if (this.state.timeRemaining < 0){
+      this.state.timeStatus = "Time is Up!";
+      alert("Score: " + this.state.successfulClicks);
+      this.setState(INITIAL_CONFIG);
+    } else {
+      this.state.timeStatus = "Time Remaining: " + this.state.timeRemaining + "s";
+      this.setState({
+        timeRemaining: this.state.timerStarted ? Math.round((this.state.timeRemaining-0.1)*10)/10 : this.state.timeRemaining,
+        timeIsUp: this.state.timeRemaining <= 0.0,
+      });
     }
   }
 
+  
   handleTargetClick(i){
+    
     let newDecoys = [];
     
     for (var i = 0; i <= this.state.decoysToAdd; i++){
@@ -79,38 +87,38 @@ class Game extends React.Component{
         />
       )
     }
-
+    
     this.setState({
       decoys: this.state.decoys.concat(newDecoys),
       decoysToAdd: this.state.decoysToAdd+2,
       successfulClicks: this.state.successfulClicks+1,
+      splitIndex: Math.floor(Math.random()*this.state.decoys.length+1),
+      timerStarted: true,
     })
+
   }
 
-  handleDecoyClick(i){
+  handleDecoyClick(){
     return;
   }
 
   render(){
-    let splitIndex = Math.floor(Math.random()*this.state.decoys.length+1);
-
     return (
-    <div>
-      <h>Score: {this.state.successfulClicks}</h>
       <div>
-        {this.state.decoys.slice(0, splitIndex)}
-        <Button text={this.state.targetText} handleClick={(i) => this.handleTargetClick(i)} />
-        {this.state.decoys.slice(splitIndex, this.state.decoys.length)}
+        <Timer tick={()=>this.tick()} timeStatus={this.state.timeStatus}/>
+        <h>Score: {this.state.successfulClicks}</h>
+        <div>
+          {this.state.decoys.slice(0, this.state.splitIndex)}
+          <Button text={this.state.targetText} handleClick={(i) => this.handleTargetClick(i)} />
+          {this.state.decoys.slice(this.state.splitIndex, this.state.decoys.length)}
+        </div>
       </div>
-    </div>
     )
-    
   }
 }
 
 ReactDOM.render(
   <div>
-    <Clock/>
     <Game/>
   </div>,
   
