@@ -126,11 +126,12 @@ class Game extends React.Component{
     for (var i = 0; i <= this.state.decoysToAdd; i++){
       let randomTop = Math.floor(Math.random()*height) + offsetTop;
       let randomLeft = Math.floor(Math.random()*width) + offsetLeft;
+      let key = this.state.successfulClicks.toString() + "." + i.toString(); // unique id
       newDecoys.push(
-        <Button 
-          key={this.state.decoys.length + i} 
+        <Button
+          key={key} 
           text={this.state.decoyText} 
-          handleClick={() => this.handleDecoyClick(i)}
+          handleClick={() => this.handleDecoyClick(key)}
           top={randomTop}
           left={randomLeft}
         />
@@ -152,10 +153,18 @@ class Game extends React.Component{
 
   }
 
-  handleDecoyClick(){
-    return;
+  removeDecoy(decoy){
+    console.log(decoy);
+    console.log(this); // the key
+    return decoy.key !== this;
   }
 
+  handleDecoyClick(key){
+    this.setState({
+      decoys: this.state.decoys.filter(this.removeDecoy, key)
+    })
+    return;
+  }
   handleSettingsClick(){
     this.setState({
       showSettings: true
@@ -165,10 +174,12 @@ class Game extends React.Component{
   handleTargetTextChange(event) {
     console.log(event);
     this.setState({targetText: event.target.value});
+    INITIAL_CONFIG.targetText = event.target.value;
   }
 
   handleDecoyTextChange(event) {
     this.setState({decoyText: event.target.value});
+    INITIAL_CONFIG.decoyText = event.target.value;
   }
 
   handleCloseSettingsClick() {
@@ -230,7 +241,7 @@ class Game extends React.Component{
         <button onClick={(i) => this.handleSettingsClick(i)} >Settings</button>
         <Timer tick={()=>this.tick()} timeStatus={this.state.timeStatus}/>
         <h2>Score: {this.state.successfulClicks}</h2>
-        <div ref={this.gameArea} class="gameContainer">
+        <div ref={this.gameArea} className="gameContainer">
           {targetAndDecoysDiv}
         </div>
       </div>
