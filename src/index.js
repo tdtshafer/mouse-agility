@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom';
 import './index.css';
 import App from './App';
 import * as serviceWorker from './serviceWorker';
+import { thisExpression } from '@babel/types';
 
 // ReactDOM.render(
 //   <React.StrictMode>
@@ -57,21 +58,16 @@ class Timer extends React.Component {
 }
 
 class Form extends React.Component {
-  constructor(props){
-    super(props);
-    this.state = {value: props.value}
-    this.handleChange = this.props.handleChange.bind(this);
-  }
   render(){
     return (
       <form>
         <label>
           {this.props.label}:
           <input 
-            value={this.state.value} 
+            value={this.props.value} 
             type={this.props.inputType} 
             name={this.props.inputName} 
-            onChange={this.handleChange}
+            onChange={this.props.onChange}
           />
         </label>
       </form>
@@ -89,7 +85,7 @@ function Button(props){
 
   return (
     <button 
-      class="button" 
+      className="button" 
       onClick={props.handleClick}
       style={positionDict}
     >{props.text}</button>
@@ -167,6 +163,7 @@ class Game extends React.Component{
   }
 
   handleTargetTextChange(event) {
+    console.log(event);
     this.setState({targetText: event.target.value});
   }
 
@@ -188,17 +185,17 @@ class Game extends React.Component{
             inputType="text" 
             inputName="targetTextInput"
             value={this.state.targetText}
-            handleChange={()=>this.handleTargetTextChange}>
+            onChange={(e)=>this.handleTargetTextChange(e)}>
           </Form>
           <Form 
             label="Decoy Text" 
             inputType="text" 
             inputName="decoyTextInput" 
             value={this.state.decoyText}
-            handleChange={()=>this.handleDecoyTextChange}>  
+            onChange={(e)=>this.handleDecoyTextChange(e)}>  
           </Form>
         </div>
-        <button onClick={()=>this.handleCloseSettingsClick}>Close</button>
+        <button onClick={()=>this.handleCloseSettingsClick()}>Close</button>
       </div>
       )
     }
@@ -232,7 +229,7 @@ class Game extends React.Component{
       <div>
         <button onClick={(i) => this.handleSettingsClick(i)} >Settings</button>
         <Timer tick={()=>this.tick()} timeStatus={this.state.timeStatus}/>
-        <h>Score: {this.state.successfulClicks}</h>
+        <h2>Score: {this.state.successfulClicks}</h2>
         <div ref={this.gameArea} class="gameContainer">
           {targetAndDecoysDiv}
         </div>
