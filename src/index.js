@@ -15,24 +15,17 @@ import { thisExpression } from '@babel/types';
 var INITIAL_CONFIG = {
   successfulClicks: 0, // user's score
 
-  decoysToAdd: 1,
-  decoys: [],
-  splitIndex: 0,
-
-  decoyText: "decoy",
-  targetText: "target",
-
   timerStarted: false,
   gameTime: 30, //time in seconds
   timeRemaining: 30.0,
   timeIsUp: false,
 
-  targetLeft: 250,
-  targetTop: 250,
-
   randomMode: true,
 
   showSettings: false,
+
+  targetText: "target",
+  decoyText: "decoy",
 }
 
 class Timer extends React.Component {
@@ -50,11 +43,19 @@ class Timer extends React.Component {
 
   render() {
     return (
-      <div>
-        <h2>{this.props.timeStatus}</h2>
-      </div>
+        <h2 id="timer">{this.props.timeStatus}</h2>
     )
   }
+}
+
+function Header(props) {
+  return (
+    <div className='header'>
+      <Timer tick={()=>props.tick()} timeStatus={props.timeStatus}/>
+      <h2 id='score'>Score: {props.successfulClicks}</h2>
+      <button id='settingsButton' onClick={(i) => props.handleSettingsClick(i)} >Settings</button>
+    </div>
+  )
 }
 
 class Form extends React.Component {
@@ -92,79 +93,14 @@ function Button(props){
   )
 }
 
-class Game extends React.Component{
+
+class Screen extends React.Component {
   constructor(props){
     super(props);
     this.state = INITIAL_CONFIG;
     this.gameArea = React.createRef()
   }
 
-  tick() {
-    if (this.state.timeRemaining < 0){
-      this.state.timeStatus = "Time is Up!";
-      alert("Score: " + this.state.successfulClicks);
-      this.setState(INITIAL_CONFIG);
-    } else {
-      this.state.timeStatus = "Time Remaining: " + this.state.timeRemaining + "s";
-      this.setState({
-        timeRemaining: this.state.timerStarted ? Math.round((this.state.timeRemaining-0.1)*10)/10 : this.state.timeRemaining,
-        timeIsUp: this.state.timeRemaining <= 0.0,
-      });
-    }
-  }
-
-  handleTargetClick(){
-    
-    let width = this.gameArea.current.offsetWidth*0.92; //to accommodate button width
-    let height = this.gameArea.current.offsetHeight*0.95; //to accommodate button height
-
-    let offsetLeft = this.gameArea.current.offsetLeft/2;
-    let offsetTop = this.gameArea.current.offsetTop;
-
-    let newDecoys = [];
-    
-    for (var i = 0; i <= this.state.decoysToAdd; i++){
-      let randomTop = Math.floor(Math.random()*height) + offsetTop;
-      let randomLeft = Math.floor(Math.random()*width) + offsetLeft;
-      let key = this.state.successfulClicks.toString() + "." + i.toString(); // unique id
-      newDecoys.push(
-        <Button
-          key={key} 
-          text={this.state.decoyText} 
-          handleClick={() => this.handleDecoyClick(key)}
-          top={randomTop}
-          left={randomLeft}
-        />
-      )
-    }
-    
-    let target;
-
-    this.setState({
-      // decoys: this.state.decoys.concat(newDecoys), // for persistent decoys
-      decoys: newDecoys, //for decoys that reset each time
-      decoysToAdd: this.state.decoysToAdd+2,
-      successfulClicks: this.state.successfulClicks+1,
-      splitIndex: Math.floor(Math.random()*this.state.decoys.length+1),
-      timerStarted: true,
-      targetTop: Math.floor(Math.random()*height) + offsetTop,
-      targetLeft: Math.floor(Math.random()*width) + offsetLeft,
-    })
-
-  }
-
-  removeDecoy(decoy){
-    console.log(decoy);
-    console.log(this); // the key
-    return decoy.key !== this;
-  }
-
-  handleDecoyClick(key){
-    this.setState({
-      decoys: this.state.decoys.filter(this.removeDecoy, key)
-    })
-    return;
-  }
   handleSettingsClick(){
     this.setState({
       showSettings: true
@@ -186,40 +122,169 @@ class Game extends React.Component{
     this.setState({showSettings: false});
   }
 
-  render(){
+  handleTargetClickParent(){
+    this.setState({
+      timerStarted: true,
+      successfulClicks: this.state.successfulClicks+1,
+    })
+  }
+
+  tick() {
+    if (this.state.timeRemaining < 0){
+      this.state.timeStatus = "Time is Up!";
+      alert("Score: " + this.state.successfulClicks);
+      this.setState(INITIAL_CONFIG);
+    } else {
+      this.state.timeStatus = "Time Remaining: " + this.state.timeRemaining + "s";
+      this.setState({
+        timeRemaining: this.state.timerStarted ? 
+                          Math.round((this.state.timeRemaining-0.1)*10)/10 : 
+                          this.state.timeRemaining,
+        timeIsUp: this.state.timeRemaining <= 0.0,
+      });
+    }
+  }
+
+
+  render() {
+    let gameArea;
     if (this.state.showSettings){
-      return (
-      <div>
-        <div ref={this.gameArea} class="gameContainer">
-          <Form 
-            label="Target Text" 
-            inputType="text" 
-            inputName="targetTextInput"
-            value={this.state.targetText}
-            onChange={(e)=>this.handleTargetTextChange(e)}>
-          </Form>
-          <Form 
-            label="Decoy Text" 
-            inputType="text" 
-            inputName="decoyTextInput" 
-            value={this.state.decoyText}
-            onChange={(e)=>this.handleDecoyTextChange(e)}>  
-          </Form>
-        </div>
-        <button onClick={()=>this.handleCloseSettingsClick()}>Close</button>
-      </div>
+      gameArea = (
+        <Settings
+          handleCloseSettingsClick={()=>this.handleCloseSettingsClick()}
+          handleTargetTextChange={(e)=>this.handleTargetTextChange(e)}
+          handleDecoyTextChange={(e)=>this.handleDecoyTextChange(e)}
+          targetText={this.state.targetText}
+          decoyText={this.state.decoyText}
+          randomMode={this.state.randomMode}
+        />
+      )
+    } else {
+      gameArea = (
+        <Game
+          handleTargetClickParent={()=>this.handleTargetClickParent()}
+          targetText={this.state.targetText}
+          decoyText={this.state.decoyText}
+          successfulClicks={this.state.successfulClicks}
+          randomMode={this.state.randomMode}
+        />
       )
     }
 
+    return (
+      <div>
+        <Header 
+          tick={() => this.tick()}
+          successfulClicks={this.state.successfulClicks}
+          timeStatus={this.state.timeStatus}
+          handleSettingsClick={()=>this.handleSettingsClick()}
+        />
+        {gameArea}
+      </div>
+    )
+  }
+}
+
+class Settings extends React.Component {
+  render() {
+      return (
+        <div>
+          <div ref={this.gameArea} className="gameContainer">
+            <Form 
+              label="Target Text" 
+              inputType="text" 
+              inputName="targetTextInput"
+              value={this.props.targetText}
+              onChange={(e)=>this.props.handleTargetTextChange(e)}>
+            </Form>
+            <Form 
+              label="Decoy Text" 
+              inputType="text" 
+              inputName="decoyTextInput" 
+              value={this.props.decoyText}
+              onChange={(e)=>this.props.handleDecoyTextChange(e)}>  
+            </Form>
+          </div>
+          <button onClick={()=>this.props.handleCloseSettingsClick()}>Close</button>
+        </div>
+      )
+    }
+}
+
+class Game extends React.Component {
+  
+  constructor(props){
+    super(props);
+    this.state = {
+        decoysToAdd: 1,
+        decoys: [],
+        splitIndex: 0,
+        targetLeft: 250,
+        targetTop: 250,
+    };
+    this.gameArea = React.createRef()
+  }
+
+  handleTargetClick(){
+    
+    let width = this.gameArea.current.offsetWidth*0.92; //to accommodate button width
+    let height = this.gameArea.current.offsetHeight*0.95; //to accommodate button height
+
+    let offsetLeft = this.gameArea.current.offsetLeft/2;
+    let offsetTop = this.gameArea.current.offsetTop;
+
+    let newDecoys = [];
+    
+    for (var i = 0; i <= this.state.decoysToAdd; i++){
+      let randomTop = Math.floor(Math.random()*height) + offsetTop;
+      let randomLeft = Math.floor(Math.random()*width) + offsetLeft;
+      let key = this.props.successfulClicks.toString() + "." + i.toString(); // unique id
+      newDecoys.push(
+        <Button
+          key={key} 
+          text={this.props.decoyText} 
+          handleClick={() => this.handleDecoyClick(key)}
+          top={randomTop}
+          left={randomLeft}
+        />
+      )
+    }
+    
+    this.props.handleTargetClickParent();
+
+    this.setState({
+      // decoys: this.state.decoys.concat(newDecoys), // for persistent decoys
+      decoys: newDecoys, //for decoys that reset each time
+      decoysToAdd: this.state.decoysToAdd+2,
+      splitIndex: Math.floor(Math.random()*this.state.decoys.length+1),
+      targetTop: Math.floor(Math.random()*height) + offsetTop,
+      targetLeft: Math.floor(Math.random()*width) + offsetLeft,
+    })
+  }
+
+  removeDecoy(decoy){
+    console.log(decoy);
+    console.log(this); // the key
+    return decoy.key !== this;
+  }
+
+  handleDecoyClick(key){
+    this.setState({
+      decoys: this.state.decoys.filter(this.removeDecoy, key)
+    })
+    return;
+  }
+
+  render(){
     let targetButton = <Button 
-                        text={this.state.targetText} 
+                        text={this.props.targetText} 
                         handleClick={(i) => this.handleTargetClick(i)} 
                         top={this.state.targetTop}
                         left={this.state.targetLeft} 
                       />
 
     let targetAndDecoysDiv;
-    if (this.state.randomMode){
+    if (this.props.randomMode){
       targetAndDecoysDiv = (
       <div>
         {this.state.decoys}
@@ -237,23 +302,17 @@ class Game extends React.Component{
     }
 
     return (
-      <div>
-        <button onClick={(i) => this.handleSettingsClick(i)} >Settings</button>
-        <Timer tick={()=>this.tick()} timeStatus={this.state.timeStatus}/>
-        <h2>Score: {this.state.successfulClicks}</h2>
-        <div ref={this.gameArea} className="gameContainer">
-          {targetAndDecoysDiv}
-        </div>
+      <div ref={this.gameArea} className="gameContainer">
+        {targetAndDecoysDiv}
       </div>
     )
     
   }
 }
 
-
 ReactDOM.render(
   <div>
-    <Game/>
+    <Screen/>
   </div>,
   
   document.getElementById('root')

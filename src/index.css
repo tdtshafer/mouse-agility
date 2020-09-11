@@ -23,3 +23,27 @@ code {
   height: 500px;
   background-color: aqua;
 }
+
+.header {
+  /* margin-left: %; */
+  margin-bottom: 2%;
+}
+/* 
+#settingsButton {
+  width: 8%;
+} */
+
+#score {
+  width: 20%;
+  padding-right: 15%;
+}
+
+#timer{
+  width: 40%;
+}
+
+#score, #timer{
+  padding-left: 5%;
+  display: inline-block;
+}
+
