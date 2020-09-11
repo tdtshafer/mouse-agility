@@ -16,13 +16,14 @@ var INITIAL_CONFIG = {
   successfulClicks: 0, // user's score
 
   timerStarted: false,
-  gameTime: 30, //time in seconds
-  timeRemaining: 30.0,
+  gameTime: 5, //time in seconds
+  timeRemaining: 5,
   timeIsUp: false,
 
   randomMode: true,
 
   showSettings: false,
+  showScore: false,
 
   targetText: "target",
   decoyText: "decoy",
@@ -129,11 +130,14 @@ class Screen extends React.Component {
     })
   }
 
+  handlePlayAgain(){
+    this.setState(INITIAL_CONFIG);
+  }
+
   tick() {
     if (this.state.timeRemaining < 0){
-      this.state.timeStatus = "Time is Up!";
-      alert("Score: " + this.state.successfulClicks);
-      this.setState(INITIAL_CONFIG);
+      this.setState({showScore: true})
+      // this.setState(INITIAL_CONFIG);
     } else {
       this.state.timeStatus = "Time Remaining: " + this.state.timeRemaining + "s";
       this.setState({
@@ -144,7 +148,6 @@ class Screen extends React.Component {
       });
     }
   }
-
 
   render() {
     let gameArea;
@@ -158,6 +161,14 @@ class Screen extends React.Component {
           decoyText={this.state.decoyText}
           randomMode={this.state.randomMode}
         />
+      )
+    } else if (this.state.showScore){
+      gameArea = (
+        <div className="gameContainer">
+          <h2>Time is up!</h2>
+          <h2>Score: {this.state.successfulClicks}</h2>
+          <button onClick={()=>this.handlePlayAgain()}>Play Again?</button>
+        </div>
       )
     } else {
       gameArea = (
@@ -188,7 +199,6 @@ class Screen extends React.Component {
 class Settings extends React.Component {
   render() {
       return (
-        <div>
           <div ref={this.gameArea} className="gameContainer">
             <Form 
               label="Target Text" 
@@ -204,7 +214,6 @@ class Settings extends React.Component {
               value={this.props.decoyText}
               onChange={(e)=>this.props.handleDecoyTextChange(e)}>  
             </Form>
-          </div>
           <button onClick={()=>this.props.handleCloseSettingsClick()}>Close</button>
         </div>
       )
