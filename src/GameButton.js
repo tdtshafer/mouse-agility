@@ -1,10 +1,10 @@
 import React from 'react';
 
-function Button(props){
+function GameButton(props){
 
     let positionDict = {
       position:"absolute", 
-      top: props.top, 
+      top: props.top,
       left: props.left,
     }
   
@@ -17,4 +17,4 @@ function Button(props){
     )
   }
 
-export default Button;
+export default GameButton;

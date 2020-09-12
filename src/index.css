@@ -18,32 +18,24 @@ code {
 }
 
 .gameContainer {
-  width: 90%;
-  margin-left: 5%;
-  height: 500px;
+  width: 100vw;
+  height: 100vh;
   background-color: aqua;
 }
-
-.header {
-  /* margin-left: %; */
-  margin-bottom: 2%;
-}
-/* 
-#settingsButton {
-  width: 8%;
-} */
 
 #score {
   width: 20%;
   padding-right: 15%;
+  opacity: 50%;
 }
 
 #timer{
-  width: 40%;
+  margin-left: 10%;
+  width: 30%;
 }
 
 #score, #timer{
-  padding-left: 5%;
+  padding-right: 5%; 
   display: inline-block;
 }
 

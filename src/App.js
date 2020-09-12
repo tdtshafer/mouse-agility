@@ -4,13 +4,15 @@ import './App.css';
 import Game from './Game';
 import Settings from './Settings';
 import Header from './Header';
+import GameButton from './GameButton';
+
 
 var INITIAL_CONFIG = {
   successfulClicks: 0, // user's score
 
   timerStarted: false,
-  gameTime: 5, //time in seconds
-  timeRemaining: 5,
+  gameTime: 30, //time in seconds
+  timeRemaining: 30,
   timeIsUp: false,
 
   randomMode: true,
@@ -26,7 +28,7 @@ class App extends React.Component {
   constructor(props){
     super(props);
     this.state = INITIAL_CONFIG;
-    this.gameArea = React.createRef()
+    this.appArea = React.createRef()
   }
 
   handleSettingsClick(){
@@ -90,9 +92,35 @@ class App extends React.Component {
         />
       )
     } else if (this.state.showScore){
+  
+      let menuButtons = [];
+      let labels = ["Instructions", "Play Again?", "Settings"];
+      let functions = [this.handleSettingsClick, this.handlePlayAgain, this.handleSettingsClick];
+      let tops = [49, 49, 49];
+      let lefts = [26, 46, 66];
+      
+      for (var i = 0; i < 3; i++){
+
+        menuButtons.push(
+            <GameButton
+              key={labels[i]} 
+              text={labels[i]} 
+              handleClick={() => functions[i]()}
+              top={tops[i].toString() + 'vh'}
+              left={lefts[i].toString() + 'vw'}
+            />
+        )
+      }
+
       gameArea = (
         <div className="gameContainer">
-          <button onClick={()=>this.handlePlayAgain()}>Play Again?</button>
+          <Header 
+            tick={() => this.tick()}
+            successfulClicks={this.state.successfulClicks}
+            timeStatus={this.state.timeStatus}
+            handleSettingsClick={()=>this.handleSettingsClick()}
+          />
+          {menuButtons}
         </div>
       )
     } else {
@@ -103,18 +131,14 @@ class App extends React.Component {
           decoyText={this.state.decoyText}
           successfulClicks={this.state.successfulClicks}
           randomMode={this.state.randomMode}
+          tick={()=>this.tick()}
+          timeStatus={this.state.timeStatus}
         />
       )
     }
 
     return (
       <div>
-        <Header 
-          tick={() => this.tick()}
-          successfulClicks={this.state.successfulClicks}
-          timeStatus={this.state.timeStatus}
-          handleSettingsClick={()=>this.handleSettingsClick()}
-        />
         {gameArea}
       </div>
     )
