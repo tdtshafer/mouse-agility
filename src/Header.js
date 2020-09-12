@@ -6,7 +6,6 @@ function Header(props) {
       <div className='header'>
         <Timer tick={()=>props.tick()} timeStatus={props.timeStatus}/>
         <h2 id='score'>Score: {props.successfulClicks}</h2>
-        <button id='settingsButton' onClick={(i) => props.handleSettingsClick(i)} >Settings</button>
       </div>
     )
   }

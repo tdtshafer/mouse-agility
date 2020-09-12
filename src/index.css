@@ -26,16 +26,16 @@ code {
 #score {
   width: 20%;
   padding-right: 15%;
-  opacity: 50%;
 }
 
 #timer{
-  margin-left: 10%;
+  margin-left: 25%;
   width: 30%;
 }
 
 #score, #timer{
   padding-right: 5%; 
   display: inline-block;
+  opacity: 50%;
 }
 
