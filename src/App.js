@@ -11,8 +11,8 @@ var INITIAL_CONFIG = {
   successfulClicks: 0, // user's score
 
   timerStarted: false,
-  gameTime: 30, //time in seconds
-  timeRemaining: 30,
+  gameTime: 5, //time in seconds
+  timeRemaining: 5,
   timeIsUp: false,
 
   randomMode: true,
@@ -22,6 +22,7 @@ var INITIAL_CONFIG = {
 
   targetText: "target",
   decoyText: "decoy",
+  decoysPersist: false,
 }
 
 class App extends React.Component {
@@ -46,6 +47,11 @@ class App extends React.Component {
   handleDecoyTextChange(event) {
     this.setState({decoyText: event.target.value});
     INITIAL_CONFIG.decoyText = event.target.value;
+  }
+
+  handleDecoysPersistCheckboxChange(event) {
+    this.setState({decoysPersist: event.target.checked})
+    INITIAL_CONFIG.decoysPersist = event.target.checked;
   }
 
   handleCloseSettingsClick() {
@@ -86,26 +92,32 @@ class App extends React.Component {
           handleCloseSettingsClick={()=>this.handleCloseSettingsClick()}
           handleTargetTextChange={(e)=>this.handleTargetTextChange(e)}
           handleDecoyTextChange={(e)=>this.handleDecoyTextChange(e)}
+          handleDecoysPersistCheckboxChange={(e)=>this.handleDecoysPersistCheckboxChange(e)}
           targetText={this.state.targetText}
           decoyText={this.state.decoyText}
+          decoysPersist={this.state.decoysPersist}
           randomMode={this.state.randomMode}
         />
       )
     } else if (this.state.showScore){
   
       let menuButtons = [];
-      let labels = ["Instructions", "Play Again?", "Settings"];
-      let functions = [this.handleSettingsClick, this.handlePlayAgain, this.handleSettingsClick];
+      let labels = ["Instructions", "Play Again", "Settings"];
+      var functions = [
+        ()=>this.handleSettingsClick(), 
+        ()=>this.handlePlayAgain(), 
+        ()=>this.handleSettingsClick(),
+      ];
       let tops = [49, 49, 49];
       let lefts = [26, 46, 66];
       
-      for (var i = 0; i < 3; i++){
+      for (var i=0; i<3; i++){
 
         menuButtons.push(
             <GameButton
               key={labels[i]} 
               text={labels[i]} 
-              handleClick={() => functions[i]()}
+              handleClick={functions[i]}
               top={tops[i].toString() + 'vh'}
               left={lefts[i].toString() + 'vw'}
             />
@@ -129,6 +141,7 @@ class App extends React.Component {
           handleTargetClickParent={()=>this.handleTargetClickParent()}
           targetText={this.state.targetText}
           decoyText={this.state.decoyText}
+          decoysPersist={this.state.decoysPersist}
           successfulClicks={this.state.successfulClicks}
           randomMode={this.state.randomMode}
           tick={()=>this.tick()}

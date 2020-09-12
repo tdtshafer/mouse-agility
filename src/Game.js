@@ -35,10 +35,14 @@ class Game extends React.Component {
       }
       
       this.props.handleTargetClickParent();
-  
+      
+      console.log(this.props);
+      let decoysState = this.props.decoysPersist ? 
+                            this.state.decoys.concat(newDecoys) : //include all previous decoys
+                            newDecoys; //only new decoys
+
       this.setState({
-        // decoys: this.state.decoys.concat(newDecoys), // for persistent decoys
-        decoys: newDecoys, //for decoys that reset each time
+        decoys: decoysState, 
         decoysToAdd: this.state.decoysToAdd+2,
         splitIndex: Math.floor(Math.random()*this.state.decoys.length+1),
         targetTop:(Math.random()*this.buttonTopAdjust).toString() + "vh",
@@ -86,7 +90,7 @@ class Game extends React.Component {
       }
   
       return (
-        <div ref={this.gameArea} className="gameContainer">
+        <div className="gameContainer">
           <Header 
             tick={() => this.props.tick()}
             successfulClicks={this.props.successfulClicks}

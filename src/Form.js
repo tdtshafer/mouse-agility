@@ -5,7 +5,7 @@ function Form(props) {
     <form>
         <label>
         {props.label}:
-        <input 
+        <input
             value={props.value} 
             type={props.inputType} 
             name={props.inputName} 

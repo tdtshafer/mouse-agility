@@ -23,6 +23,14 @@ code {
   background-color: aqua;
 }
 
+.settingsContainer {
+  top: 30vh;
+  left: 33vw;
+  width: 33%;
+  position: absolute;
+  background-color: blue;
+}
+
 #score {
   width: 20%;
   padding-right: 15%;
@@ -37,5 +45,13 @@ code {
   padding-right: 5%; 
   display: inline-block;
   opacity: 50%;
+}
+
+form {
+  padding: 2%;
+}
+
+input {
+  margin-left: 2%;
 }
 
