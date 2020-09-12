@@ -19,7 +19,11 @@ class Game extends React.Component {
     }
   
     handleTargetClick(){
-  
+    
+      if(this.props.timeRemaining <= 0){
+          return;
+      }
+
       let newDecoys = [];
       for (var i = 0; i <= this.state.decoysToAdd; i++){
         let key = this.props.successfulClicks.toString() + "." + i.toString(); // unique id
@@ -27,6 +31,7 @@ class Game extends React.Component {
           <GameButton
             key={key} 
             text={this.props.decoyText} 
+            className="button"
             handleClick={() => this.handleDecoyClick(key)}
             top={(Math.random()*this.buttonTopAdjust).toString() + "vh"}
             left={(Math.random()*this.buttonLeftAdjust).toString() + "vw"}
@@ -36,7 +41,6 @@ class Game extends React.Component {
       
       this.props.handleTargetClickParent();
       
-      console.log(this.props);
       let decoysState = this.props.decoysPersist ? 
                             this.state.decoys.concat(newDecoys) : //include all previous decoys
                             newDecoys; //only new decoys
@@ -51,8 +55,6 @@ class Game extends React.Component {
     }
   
     removeDecoy(decoy){
-      console.log(decoy);
-      console.log(this); // the key
       return decoy.key !== this;
     }
   
@@ -64,7 +66,9 @@ class Game extends React.Component {
     }
   
     render(){
+
       let targetButton = (<GameButton 
+                          className={this.props.timeRemaining < 0.0 ? "revealedButton" : "button"}
                           text={this.props.targetText} 
                           handleClick={(i) => this.handleTargetClick(i)}
                           top={this.state.targetTop}

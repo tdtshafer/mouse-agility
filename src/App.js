@@ -11,8 +11,7 @@ var INITIAL_CONFIG = {
   successfulClicks: 0, // user's score
 
   timerStarted: false,
-  gameTime: 5, //time in seconds
-  timeRemaining: 5,
+  timeRemaining: 60, //time in seconds
   timeIsUp: false,
 
   randomMode: true,
@@ -70,9 +69,17 @@ class App extends React.Component {
   }
 
   tick() {
-    if (this.state.timeRemaining < 0){
+    if (this.state.timeRemaining < -2){
       this.setState({showScore: true})
       // this.setState(INITIAL_CONFIG);
+    } else if (this.state.timeRemaining <= 0.0){
+      this.setState({
+        timeIsUp: true,
+        timeRemaining: this.state.timerStarted ? 
+                          Math.round((this.state.timeRemaining-0.1)*10)/10 : 
+                          this.state.timeRemaining,
+        timeStatus: "Time is up!",
+      })
     } else {
       this.state.timeStatus = "Time Remaining: " + this.state.timeRemaining + "s";
       this.setState({
@@ -116,7 +123,8 @@ class App extends React.Component {
         menuButtons.push(
             <GameButton
               key={labels[i]} 
-              text={labels[i]} 
+              text={labels[i]}
+              className="button"
               handleClick={functions[i]}
               top={tops[i].toString() + 'vh'}
               left={lefts[i].toString() + 'vw'}
@@ -146,6 +154,7 @@ class App extends React.Component {
           randomMode={this.state.randomMode}
           tick={()=>this.tick()}
           timeStatus={this.state.timeStatus}
+          timeRemaining={this.state.timeRemaining}
         />
       )
     }

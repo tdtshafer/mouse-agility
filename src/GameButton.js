@@ -10,7 +10,7 @@ function GameButton(props){
   
     return (
       <button 
-        className="button" 
+        className={props.className} 
         onClick={props.handleClick}
         style={positionDict}
       >{props.text}</button>
