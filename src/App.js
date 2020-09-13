@@ -17,7 +17,7 @@ var INITIAL_CONFIG = {
   randomMode: true,
 
   showSettings: false,
-  showScore: false,
+  showScore: true,
 
   targetText: "target",
   decoyText: "decoy",
@@ -65,6 +65,7 @@ class App extends React.Component {
   }
 
   handlePlayAgain(){
+    INITIAL_CONFIG.showScore=false;
     this.setState(INITIAL_CONFIG);
   }
 
@@ -109,7 +110,7 @@ class App extends React.Component {
     } else if (this.state.showScore){
   
       let menuButtons = [];
-      let labels = ["Instructions", "Play Again", "Settings"];
+      let labels = ["Instructions", "Play", "Settings"];
       var functions = [
         ()=>this.handleSettingsClick(), 
         ()=>this.handlePlayAgain(), 
